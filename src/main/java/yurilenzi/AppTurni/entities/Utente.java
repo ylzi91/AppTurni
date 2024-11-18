@@ -21,23 +21,25 @@ public class Utente implements UserDetails {
     @Id
     @Setter(AccessLevel.NONE)
     private String email;
-    private String nome, cognome, immagine, documenti;
+    private String nome, cognome, immagine, documenti, password;
     @Enumerated(EnumType.STRING)
     private Role role;
 
 
-    public Utente(String email, String nome, String cognome) {
+    public Utente(String email, String nome, String cognome, String password) {
         this.email = email;
         this.nome = nome;
         this.cognome = cognome;
+        this.password = password;
         this.role = Role.USER;
         this.immagine = "https://ui-avatars.com/api/?name=" + nome + "+" + cognome;
     }
 
-    public Utente(String email, String nome, String cognome, Role role) {
+    public Utente(String email, String nome, String cognome, String password, Role role) {
         this.email = email;
         this.nome = nome;
         this.cognome = cognome;
+        this.password = password;
         this.role = role;
         this.immagine = "https://ui-avatars.com/api/?name=" + nome + "+" + cognome;
     }
@@ -48,13 +50,8 @@ public class Utente implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return "";
-    }
-
-    @Override
     public String getUsername() {
-        return "";
+        return this.email;
     }
 
 }
