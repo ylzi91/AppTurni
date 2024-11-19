@@ -1,5 +1,6 @@
 package yurilenzi.AppTurni.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties({"password", "authorities", "role", "enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired"})
 public class Utente implements UserDetails {
     @Id
     @Setter(AccessLevel.NONE)

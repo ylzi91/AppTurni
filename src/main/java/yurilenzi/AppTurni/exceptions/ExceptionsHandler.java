@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import yurilenzi.AppTurni.payloads.ErrorResponseDTO;
 
+import java.time.format.DateTimeParseException;
+
 @RestControllerAdvice
 public class ExceptionsHandler {
 
-    @ExceptionHandler(SameEmailException.class)
+    @ExceptionHandler(SameException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDTO handleBadRequest(SameEmailException ex){
+    public ErrorResponseDTO handleBadRequest(SameException ex){
         return new ErrorResponseDTO(ex.getMessage());
     }
 
@@ -32,5 +34,11 @@ public class ExceptionsHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDTO handleNotFoundRequest(NotFoundException ex){
         return new ErrorResponseDTO(ex.getMessage());
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponseDTO handleNotFoundRequest(DateTimeParseException ex){
+        return new ErrorResponseDTO("La data non è nel formato corretto (yyyy-mm-dd)");
     }
 }
