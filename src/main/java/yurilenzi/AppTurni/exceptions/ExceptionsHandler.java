@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import yurilenzi.AppTurni.payloads.ErrorResponseDTO;
+import yurilenzi.AppTurni.payloads.GenericResponseDTO;
 
 import java.time.format.DateTimeParseException;
 
@@ -40,5 +41,17 @@ public class ExceptionsHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDTO handleNotFoundRequest(DateTimeParseException ex){
         return new ErrorResponseDTO("La data non è nel formato corretto (yyyy-mm-dd)");
+    }
+
+    @ExceptionHandler(ForbiddenRequestException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponseDTO handleNotFoundRequest(ForbiddenRequestException ex){
+        return new ErrorResponseDTO(ex.getMessage());
+    }
+
+    @ExceptionHandler(EmptyArrayException.class)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public GenericResponseDTO handleNoContentRequest(EmptyArrayException ex){
+        return new GenericResponseDTO(ex.getMessage());
     }
 }

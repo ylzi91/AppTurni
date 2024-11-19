@@ -22,14 +22,14 @@ public class CambioTurno {
     @Enumerated(EnumType.STRING)
     private StatoRichiesta statoRichiesta;
     @OneToOne
-    private UtenteTurno utenteRichiedente;
+    private UtenteTurno utenteRichiedenteTurno;
     @OneToOne
-    private UtenteTurno utenteRispondente;
+    private UtenteTurno utenteRispondenteTurno;
 
-    public CambioTurno(LocalDate dataRichiesta, UtenteTurno utenteRichiedente, UtenteTurno utenteRispondente) {
+    public CambioTurno(LocalDate dataRichiesta, UtenteTurno utenteRichiedenteTurno, UtenteTurno utenteRispondenteTurno) {
         this.dataRichiesta = dataRichiesta;
         this.statoRichiesta = StatoRichiesta.IN_CORSO;
-        this.utenteRichiedente = utenteRichiedente;
-        this.utenteRispondente = utenteRispondente;
+        this.utenteRichiedenteTurno = utenteRichiedenteTurno;
+        this.utenteRispondenteTurno = utenteRispondenteTurno;
     }
 }
