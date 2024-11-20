@@ -3,6 +3,7 @@ package yurilenzi.AppTurni.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import yurilenzi.AppTurni.entities.Turno;
+import yurilenzi.AppTurni.exceptions.BadRequestException;
 import yurilenzi.AppTurni.exceptions.NotFoundException;
 import yurilenzi.AppTurni.exceptions.SameException;
 import yurilenzi.AppTurni.payloads.NewTurnoDTO;
@@ -20,10 +21,15 @@ public class TurnoService {
         if(turnoRepository.findById(body.nomeTurno()).isPresent())
             throw new SameException("Il turno con nome " + body.nomeTurno() + " è già presente");
         if(body.oraFine() == null || body.oraInizio() == null){
-            return turnoRepository.save(new Turno(body.nomeTurno()));
+            return turnoRepository.save(new Turno(body.nomeTurno().toUpperCase()));
         }
         else {
-            return turnoRepository.save(new Turno(body.nomeTurno(), LocalTime.parse(body.oraInizio()), LocalTime.parse(body.oraFine())));
+            LocalTime oraInizio = LocalTime.parse(body.oraInizio());
+            LocalTime oraFine = LocalTime.parse(body.oraFine());
+            if(oraInizio.isBefore(oraFine))
+                return turnoRepository.save(new Turno(body.nomeTurno().toUpperCase(), oraInizio, oraFine));
+            else
+                throw new BadRequestException("L'ora fine deve essere successiva a l'ora di inizio");
         }
     }
 
@@ -31,6 +37,14 @@ public class TurnoService {
         Turno found = null;
         found = turnoRepository.findById(nomeTurno).orElseThrow(()-> new NotFoundException(nomeTurno + " non è stato trovato"));
         return found;
+    }
+
+    public Turno checkAndSaveTurnoFerie(){
+        Turno foundTurno = null;
+        if(turnoRepository.findById("F").isPresent())
+            return turnoRepository.findById("F").get();
+        else
+            return turnoRepository.save(new Turno("F"));
     }
 
 }

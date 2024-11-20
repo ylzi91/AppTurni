@@ -5,15 +5,14 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import yurilenzi.AppTurni.entities.UtenteTurno;
 import yurilenzi.AppTurni.exceptions.BadRequestException;
 import yurilenzi.AppTurni.payloads.NewUtenteTurnoDTO;
+import yurilenzi.AppTurni.services.TurnoService;
 import yurilenzi.AppTurni.services.UtenteTurnoService;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
 public class UtenteTurnoController {
     @Autowired
     UtenteTurnoService utenteTurnoService;
+
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'CAPO')")
@@ -34,5 +34,10 @@ public class UtenteTurnoController {
             throw new BadRequestException(message);
         }
         return utenteTurnoService.salvaUtenteTurno(body);
+    }
+    @PostMapping("/{email}/{idFerie}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CAPO')")
+    public List<UtenteTurno> saveFerie(@PathVariable String email, @PathVariable Long idFerie){
+        return utenteTurnoService.saveFerie(idFerie, email);
     }
 }

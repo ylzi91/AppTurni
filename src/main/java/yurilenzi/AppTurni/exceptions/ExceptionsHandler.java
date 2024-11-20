@@ -54,4 +54,10 @@ public class ExceptionsHandler {
     public GenericResponseDTO handleNoContentRequest(EmptyArrayException ex){
         return new GenericResponseDTO(ex.getMessage());
     }
+
+    @ExceptionHandler(IndexOutOfBoundsException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponseDTO handleNoContentRequest(IndexOutOfBoundsException ex){
+        return new ErrorResponseDTO(ex.getMessage());
+    }
 }

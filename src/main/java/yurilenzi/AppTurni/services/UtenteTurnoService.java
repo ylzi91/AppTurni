@@ -6,11 +6,13 @@ import yurilenzi.AppTurni.entities.Turno;
 import yurilenzi.AppTurni.entities.Utente;
 import yurilenzi.AppTurni.entities.UtenteTurno;
 import yurilenzi.AppTurni.exceptions.BadRequestException;
+import yurilenzi.AppTurni.exceptions.EmptyArrayException;
 import yurilenzi.AppTurni.exceptions.NotFoundException;
 import yurilenzi.AppTurni.payloads.NewUtenteTurnoDTO;
 import yurilenzi.AppTurni.repositories.UtenteTurnoRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,6 +23,8 @@ public class UtenteTurnoService {
     UtenteService utenteService;
     @Autowired
     TurnoService turnoService;
+    @Autowired
+    FerieService ferieService;
 
     public UtenteTurno salvaUtenteTurno(NewUtenteTurnoDTO body){
         Utente foundUtente = utenteService.findByEmail(body.emailDipendente());
@@ -41,5 +45,19 @@ public class UtenteTurnoService {
         UtenteTurno found = null;
         found = utenteTurnoRepository.findById(idUtenteTurno).orElseThrow(()-> new NotFoundException("Utente turno non trovato"));
         return found;
+    }
+
+    public List<UtenteTurno> saveFerie(Long idFerie, String emailUtente){
+        List<UtenteTurno> utenteTurnoList = new ArrayList<>();
+        Utente foundUtente = utenteService.findByEmail(emailUtente);
+        Turno takeTurnoFerie = turnoService.checkAndSaveTurnoFerie();
+        List<LocalDate> dateList = ferieService.aggiornaTurniConFerie(idFerie);
+        dateList.forEach(localDate -> {
+            if(utenteTurnoRepository.findByUtenteAndTurnoAndGiornoTurno(foundUtente, takeTurnoFerie, localDate).isEmpty())
+                utenteTurnoList.add(utenteTurnoRepository.save(new UtenteTurno(localDate, foundUtente, takeTurnoFerie)));
+        });
+        if(utenteTurnoList.isEmpty())
+            throw new EmptyArrayException("Hai già dato le ferie in questi giorni");
+        return utenteTurnoList;
     }
 }
