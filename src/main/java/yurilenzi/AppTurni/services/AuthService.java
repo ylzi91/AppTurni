@@ -22,7 +22,7 @@ public class AuthService {
         Utente found = utenteService.findByEmail(body.email());
         if(bcrypt.matches(body.password(), found.getPassword())){
             String accesToken = jwt.createToken(found);
-            return new LoginResponseDTO(accesToken);
+            return new LoginResponseDTO(accesToken, found.getRole());
         }
         else throw new UnauthorizedException("Credenziali errate");
 

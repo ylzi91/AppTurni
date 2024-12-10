@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import yurilenzi.AppTurni.entities.Ferie;
+import yurilenzi.AppTurni.entities.StatoRichiesta;
 import yurilenzi.AppTurni.entities.Utente;
 import yurilenzi.AppTurni.payloads.NewFerieDTO;
 import yurilenzi.AppTurni.payloads.UpdateStatoRichiestaDTO;
@@ -33,10 +34,15 @@ public class FerieController {
         return ferieService.vediMieFerie(currentUtente);
     }
 
-    @GetMapping("/daapprovare")
+    @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'CAPO')")
-    public List<Ferie> vediTutteLeRichiesteDiFerie(){
-        return ferieService.vediFerieDaApprovarre();
+    public List<Ferie> vediTutteLeRichiesteDiFerie(@RequestParam(required = false) StatoRichiesta statoRichiesta){
+        return ferieService.vediFerie(statoRichiesta);
+    }
+
+    @DeleteMapping("/{idFerie}")
+    public void eliminaFerie(@AuthenticationPrincipal Utente currentUtente, @PathVariable Long idFerie){
+        ferieService.eliminaFerie(currentUtente, idFerie);
     }
 
 }

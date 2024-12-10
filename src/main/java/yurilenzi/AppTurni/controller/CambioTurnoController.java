@@ -27,6 +27,10 @@ public class CambioTurnoController {
     public List<CambioTurno> vediRichiesteInIngresso(@AuthenticationPrincipal Utente currentUtente){
         return cambioTurnoService.vediCambiTurniIngresso(currentUtente);
     }
+    @GetMapping("/me/ingresso/in_corso")
+    public List<CambioTurno> vediRichiesteInIngressoInCorso(@AuthenticationPrincipal Utente currentUtente){
+        return cambioTurnoService.vediCambiTurniIngressoInCorso(currentUtente);
+    }
     @GetMapping("/me/uscita")
     public List<CambioTurno> vediRichiesteInUscita(@AuthenticationPrincipal Utente currentUtente){
         return cambioTurnoService.vediCambiTurnoUscita(currentUtente);

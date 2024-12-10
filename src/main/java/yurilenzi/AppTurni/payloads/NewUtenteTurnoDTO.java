@@ -8,6 +8,7 @@ public record NewUtenteTurnoDTO(
         @NotEmpty(message = "Il campo email non può essere vuoto")
         String emailDipendente,
         @NotEmpty(message = "Il campo nome turno non può essere vuoto")
-        String nomeTurno
+        String nomeTurno,
+        Long idFromDb
 ) {
 }

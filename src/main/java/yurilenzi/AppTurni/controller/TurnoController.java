@@ -5,15 +5,14 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import yurilenzi.AppTurni.entities.Turno;
 import yurilenzi.AppTurni.exceptions.BadRequestException;
 import yurilenzi.AppTurni.payloads.NewTurnoDTO;
+import yurilenzi.AppTurni.payloads.UpdateTurnoDTO;
 import yurilenzi.AppTurni.services.TurnoService;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,5 +31,28 @@ public class TurnoController {
         }
         return turnoService.creaTurno(body);
     }
+
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CAPO')")
+    public List<Turno> vediTurni(){
+        return turnoService.vediTurni();
+    }
+
+    @PatchMapping("/{nomeTurno}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CAPO')")
+    public Turno modificaTurno(@RequestBody @Validated UpdateTurnoDTO body, BindingResult validationResult, @PathVariable String nomeTurno){
+        if(validationResult.hasErrors()){
+            String message = validationResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(". "));
+            throw new BadRequestException(message);
+        }
+        return turnoService.modificaOrarioTurno(body, nomeTurno.toUpperCase());
+    }
+
+    @DeleteMapping("/{nomeTurno}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CAPO')")
+    public void deleteTurno(@PathVariable String nomeTurno){
+        turnoService.eliminaTurno(nomeTurno);
+    }
+
 
 }

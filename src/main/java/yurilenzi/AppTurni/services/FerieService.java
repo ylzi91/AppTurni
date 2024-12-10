@@ -39,11 +39,14 @@ public class FerieService {
         return ferieRepository.findByUtente(currentUtente);
     }
 
-    public List<Ferie> vediFerieDaApprovarre(){
-        if(ferieRepository.findByStatoRichiesta(StatoRichiesta.IN_CORSO).isEmpty())
+    public List<Ferie> vediFerie(StatoRichiesta statoRichiesta){
+        if(statoRichiesta == null){
+            return ferieRepository.findAll();
+        }
+        if(ferieRepository.findByStatoRichiesta(statoRichiesta).isEmpty())
             throw new EmptyArrayException("Non ci sono ferie da approvare");
         else
-            return ferieRepository.findByStatoRichiesta(StatoRichiesta.IN_CORSO);
+            return ferieRepository.findByStatoRichiesta(statoRichiesta);
     }
 
     public Ferie findById(Long idFerie){
@@ -62,8 +65,7 @@ public class FerieService {
             throw new ForbiddenRequestException("Puoi solo approvare o disapprovare la richiesta");
     }
 
-    public List<LocalDate> aggiornaTurniConFerie(Long idFerie){
-        Ferie foundFerie = this.findById(idFerie);
+    public List<LocalDate> aggiornaTurniConFerie(Ferie foundFerie){
         List<LocalDate> dateList = new ArrayList<>();
         for(LocalDate date = foundFerie.getDataInizio();
             !date.isAfter(foundFerie.getDataFine());
@@ -71,6 +73,15 @@ public class FerieService {
             dateList.add(date);
         }
         return dateList;
+    }
 
+    public void eliminaFerie (Utente currentUtente, Long idFerie){
+        Ferie foundFerie = this.findById(idFerie);
+        if(foundFerie.getStatoRichiesta().equals(StatoRichiesta.IN_CORSO) && foundFerie.getUtente().getEmail().equals(currentUtente.getEmail())){
+            ferieRepository.delete(foundFerie);
+        }
+        else {
+            throw new BadRequestException("La richiesta ha già avuto risposta o non sei autorizzato a eliminare");
+        }
     }
 }

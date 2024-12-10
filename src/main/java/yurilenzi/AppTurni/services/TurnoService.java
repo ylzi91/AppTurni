@@ -4,12 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import yurilenzi.AppTurni.entities.Turno;
 import yurilenzi.AppTurni.exceptions.BadRequestException;
+import yurilenzi.AppTurni.exceptions.EmptyArrayException;
 import yurilenzi.AppTurni.exceptions.NotFoundException;
 import yurilenzi.AppTurni.exceptions.SameException;
 import yurilenzi.AppTurni.payloads.NewTurnoDTO;
+import yurilenzi.AppTurni.payloads.UpdateTurnoDTO;
 import yurilenzi.AppTurni.repositories.TurnoRepository;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class TurnoService {
@@ -26,6 +29,10 @@ public class TurnoService {
         else {
             LocalTime oraInizio = LocalTime.parse(body.oraInizio());
             LocalTime oraFine = LocalTime.parse(body.oraFine());
+            if(body.isAfterMidnight()){
+                LocalTime midnight = LocalTime.MIDNIGHT;
+                return turnoRepository.save(new Turno(body.nomeTurno(), oraInizio, oraFine, midnight));
+            }
             if(oraInizio.isBefore(oraFine))
                 return turnoRepository.save(new Turno(body.nomeTurno().toUpperCase(), oraInizio, oraFine));
             else
@@ -45,6 +52,26 @@ public class TurnoService {
             return turnoRepository.findById("F").get();
         else
             return turnoRepository.save(new Turno("F"));
+    }
+
+    public List<Turno> vediTurni(){
+        if(turnoRepository.findAll().isEmpty())
+            throw new EmptyArrayException("Non ci sono turni");
+        return turnoRepository.findAll();
+    }
+
+
+    public Turno modificaOrarioTurno(UpdateTurnoDTO body, String nomeTurno){
+        Turno foundTurno = this.findByNomeTurno(nomeTurno);
+        foundTurno.setOraInizio(LocalTime.parse(body.oraInizio()));
+        foundTurno.setOraFine(LocalTime.parse(body.oraFine()));
+        foundTurno.setDurataTurno(LocalTime.parse(body.oraInizio()), LocalTime.parse(body.oraFine()));
+        return turnoRepository.save(foundTurno);
+    }
+
+    public void eliminaTurno(String nomeTurno){
+        Turno found = findByNomeTurno(nomeTurno);
+        turnoRepository.delete(found);
     }
 
 }

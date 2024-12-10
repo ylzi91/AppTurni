@@ -54,6 +54,12 @@ public class CambioTurnoService {
             throw new EmptyArrayException("Non ci sono cambi turno da approvare");
         return cambioTurnoRepository.findByUtenteRispondenteTurno(currentUtente);
     }
+
+    public List<CambioTurno> vediCambiTurniIngressoInCorso(Utente currentUtente){
+        if(cambioTurnoRepository.findByUtenteRispondenteTurnoAndInCorso(currentUtente, StatoRichiesta.IN_CORSO).isEmpty())
+            throw new EmptyArrayException("Non ci sono cambi turno da approvare");
+        return cambioTurnoRepository.findByUtenteRispondenteTurnoAndInCorso(currentUtente, StatoRichiesta.IN_CORSO);
+    }
     public List<CambioTurno> vediCambiTurnoUscita(Utente currentUtente){
         if(cambioTurnoRepository.findByUtenteRichiedenteTurno(currentUtente).isEmpty())
             throw new EmptyArrayException("Non hai effettuato nessuna richiesta di cambio");

@@ -17,4 +17,7 @@ public interface CambioTurnoRepository extends JpaRepository <CambioTurno, Long>
     List<CambioTurno> findByUtenteRichiedenteTurno(Utente utente);
 
     List<CambioTurno> findByStatoRichiestaOrStatoRichiestaOrStatoRichiesta(StatoRichiesta statoRichiesta, StatoRichiesta statoRichiesta2, StatoRichiesta statoRichiesta3);
+
+    @Query("select ct from CambioTurno ct where ct.utenteRispondenteTurno.utente = :utente and ct.statoRichiesta = :statoRichiesta")
+    List<CambioTurno> findByUtenteRispondenteTurnoAndInCorso(Utente utente, StatoRichiesta statoRichiesta);
 }
