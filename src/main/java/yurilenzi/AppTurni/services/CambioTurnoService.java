@@ -1,6 +1,7 @@
 package yurilenzi.AppTurni.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import yurilenzi.AppTurni.entities.*;
 import yurilenzi.AppTurni.exceptions.BadRequestException;
@@ -93,37 +94,32 @@ public class CambioTurnoService {
                 StatoRichiesta.RIFIUTATO_CAPO);
     }
 
+    @Transactional
     public CambioTurno approvaDisapprovaCambioCapo(Long idCambio, UpdateStatoRichiestaDTO body){
         CambioTurno foundCambioTurno = this.findById(idCambio);
-        if(foundCambioTurno.getStatoRichiesta() == StatoRichiesta.APPROVATA_RISPONDENTE){
-            if(body.statoRichiesta() == StatoRichiesta.APPROVATO_CAPO || body.statoRichiesta() == StatoRichiesta.RIFIUTATO_CAPO)
-                if(body.statoRichiesta() == StatoRichiesta.APPROVATO_CAPO ){
+        if(foundCambioTurno.getStatoRichiesta() != StatoRichiesta.APPROVATA_RISPONDENTE)
+            throw new ForbiddenRequestException("Non puoi accedere a questa richiesta al momento");
+        if(body.statoRichiesta() != StatoRichiesta.APPROVATO_CAPO && body.statoRichiesta() != StatoRichiesta.RIFIUTATO_CAPO)
+            throw new ForbiddenRequestException("Puoi solo approvare o rifiutare la richiesta");
 
-                    UtenteTurno utenteTurnoRichSwitchRis = utenteTurnoService.findByid(foundCambioTurno.getUtenteRichiedenteTurno().getId());
-                    UtenteTurno utenteTurnoRisSwitchRich = utenteTurnoService.findByid(foundCambioTurno.getUtenteRispondenteTurno().getId());
-                    UtenteTurno utenteAppoggio = new UtenteTurno();
+        if(body.statoRichiesta() == StatoRichiesta.APPROVATO_CAPO){
+            UtenteTurno utenteTurnoRich = utenteTurnoService.findByid(foundCambioTurno.getUtenteRichiedenteTurno().getId());
+            UtenteTurno utenteTurnoRis = utenteTurnoService.findByid(foundCambioTurno.getUtenteRispondenteTurno().getId());
 
-                    utenteAppoggio.setGiornoTurno(utenteTurnoRichSwitchRis.getGiornoTurno());
-                    utenteAppoggio.setTurno(utenteTurnoRichSwitchRis.getTurno());
+            LocalDate giornoAppoggio = utenteTurnoRich.getGiornoTurno();
+            Turno turnoAppoggio = utenteTurnoRich.getTurno();
 
-                    utenteTurnoRichSwitchRis.setGiornoTurno(utenteTurnoRisSwitchRich.getGiornoTurno());
-                    utenteTurnoRisSwitchRich.setGiornoTurno(utenteAppoggio.getGiornoTurno());
+            utenteTurnoRich.setGiornoTurno(utenteTurnoRis.getGiornoTurno());
+            utenteTurnoRich.setTurno(utenteTurnoRis.getTurno());
+            utenteTurnoRis.setGiornoTurno(giornoAppoggio);
+            utenteTurnoRis.setTurno(turnoAppoggio);
 
-                    utenteTurnoRichSwitchRis.setTurno(utenteTurnoRisSwitchRich.getTurno());
-                    utenteTurnoRisSwitchRich.setTurno(utenteAppoggio.getTurno());
-
-                    utenteTurnoRepository.save(utenteTurnoRichSwitchRis);
-                    utenteTurnoRepository.save(utenteTurnoRisSwitchRich);
-                }
-        } else {
-                throw new ForbiddenRequestException("Non puoi accedere a questa richiesta al momento");
-            }
+            utenteTurnoRepository.save(utenteTurnoRich);
+            utenteTurnoRepository.save(utenteTurnoRis);
+        }
 
         foundCambioTurno.setStatoRichiesta(body.statoRichiesta());
-        cambioTurnoRepository.save(foundCambioTurno);
-        return foundCambioTurno;
-
+        return cambioTurnoRepository.save(foundCambioTurno);
     }
-
 
 }

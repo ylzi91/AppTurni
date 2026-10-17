@@ -21,20 +21,21 @@ public class TurnoService {
 
 
     public Turno creaTurno(NewTurnoDTO body){
-        if(turnoRepository.findById(body.nomeTurno()).isPresent())
-            throw new SameException("Il turno con nome " + body.nomeTurno() + " è già presente");
+        String nomeTurno = body.nomeTurno().toUpperCase();
+        if(turnoRepository.findById(nomeTurno).isPresent())
+            throw new SameException("Il turno con nome " + nomeTurno + " è già presente");
         if(body.oraFine() == null || body.oraInizio() == null){
-            return turnoRepository.save(new Turno(body.nomeTurno().toUpperCase()));
+            return turnoRepository.save(new Turno(nomeTurno));
         }
         else {
             LocalTime oraInizio = LocalTime.parse(body.oraInizio());
             LocalTime oraFine = LocalTime.parse(body.oraFine());
-            if(body.isAfterMidnight()){
+            if(Boolean.TRUE.equals(body.isAfterMidnight())){
                 LocalTime midnight = LocalTime.MIDNIGHT;
-                return turnoRepository.save(new Turno(body.nomeTurno(), oraInizio, oraFine, midnight));
+                return turnoRepository.save(new Turno(nomeTurno, oraInizio, oraFine, midnight));
             }
             if(oraInizio.isBefore(oraFine))
-                return turnoRepository.save(new Turno(body.nomeTurno().toUpperCase(), oraInizio, oraFine));
+                return turnoRepository.save(new Turno(nomeTurno, oraInizio, oraFine));
             else
                 throw new BadRequestException("L'ora fine deve essere successiva a l'ora di inizio");
         }

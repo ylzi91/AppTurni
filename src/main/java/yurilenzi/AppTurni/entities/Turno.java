@@ -52,6 +52,8 @@ public class Turno {
 
     public void setDurataTurno(LocalTime oraInizio, LocalTime oraFine) {
         long minutes = oraInizio.until(oraFine, ChronoUnit.MINUTES);
+        if (minutes < 0)
+            minutes += 24 * 60; // turno a cavallo della mezzanotte
         this.durataTurno = (double) minutes / 60;
     }
 }

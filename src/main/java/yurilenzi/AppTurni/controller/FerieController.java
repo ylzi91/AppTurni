@@ -25,6 +25,7 @@ public class FerieController {
     }
 
     @PatchMapping("/aod/{idFerie}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CAPO')")
     public Ferie approvaDisapporvaFerie(@RequestBody UpdateStatoRichiestaDTO body, @PathVariable Long idFerie){
         return ferieService.approvaDisapprovaFerie(body, idFerie);
     }

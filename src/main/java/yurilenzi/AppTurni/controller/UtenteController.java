@@ -87,7 +87,7 @@ public class UtenteController {
         return utenteService.updateNomeCognome(currentUtente, body);
     }
     @PatchMapping("/me/password")
-    public void updatePassword(@AuthenticationPrincipal Utente currentUtente, @RequestBody UpadatePassword body, BindingResult validationResult){
+    public void updatePassword(@AuthenticationPrincipal Utente currentUtente, @RequestBody @Validated UpadatePassword body, BindingResult validationResult){
         if(validationResult.hasErrors()){
             String message = validationResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(". "));
             throw new BadRequestException(message);
