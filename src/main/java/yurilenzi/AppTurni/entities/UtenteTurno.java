@@ -22,13 +22,6 @@ public class UtenteTurno {
     private Utente utente;
     @ManyToOne
     private Turno turno;
-    @OneToOne(mappedBy = "utenteRichiedenteTurno")
-    @JsonIgnore
-    private CambioTurno utenteTurnoRich;
-    @OneToOne(mappedBy = "utenteRispondenteTurno")
-    @JsonIgnore
-    private CambioTurno utenteTurnoRis;
-
 
     public UtenteTurno(Long id, LocalDate giornoTurno, Utente utente, Turno turno) {
         this.id = id;

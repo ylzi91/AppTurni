@@ -1,4 +1,4 @@
 package yurilenzi.AppTurni.payloads;
 
-public record NewResponseSumDTO(Double sommaOra) {
+public record NewResponseSumDTO(String email, Double sommaOra) {
 }

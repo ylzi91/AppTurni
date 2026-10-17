@@ -21,9 +21,9 @@ public class CambioTurno {
     private LocalDate dataRichiesta;
     @Enumerated(EnumType.STRING)
     private StatoRichiesta statoRichiesta;
-    @OneToOne
+    @ManyToOne
     private UtenteTurno utenteRichiedenteTurno;
-    @OneToOne
+    @ManyToOne
     private UtenteTurno utenteRispondenteTurno;
 
     public CambioTurno(LocalDate dataRichiesta, UtenteTurno utenteRichiedenteTurno, UtenteTurno utenteRispondenteTurno) {

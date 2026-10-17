@@ -9,6 +9,7 @@ import yurilenzi.AppTurni.exceptions.BadRequestException;
 import yurilenzi.AppTurni.exceptions.EmptyArrayException;
 import yurilenzi.AppTurni.exceptions.NotFoundException;
 import yurilenzi.AppTurni.payloads.GenericResponseDTO;
+import yurilenzi.AppTurni.payloads.NewResponseSumDTO;
 import yurilenzi.AppTurni.payloads.NewUtenteTurnoDTO;
 import yurilenzi.AppTurni.repositories.UtenteTurnoRepository;
 
@@ -102,12 +103,17 @@ public class UtenteTurnoService {
     }
 
 
-    public Double oreTotaliUtente(String email, LocalDate dataInizio, LocalDate datafine){
-        Utente foundUtente = utenteService.findByEmail(email);
-        if(utenteTurnoRepository.filterByDateAndSum(foundUtente, dataInizio, datafine) == null)
-            return (double) 0;
-        else
-            return utenteTurnoRepository.filterByDateAndSum(foundUtente, dataInizio, datafine);
+    public List<NewResponseSumDTO> oreTotaliUtente(List<String> emails, LocalDate dataInizio, LocalDate datafine){
+        List<NewResponseSumDTO> responseSumDTOS = new ArrayList<>();
+        emails.forEach(email -> {
+            Utente foundUtente = utenteService.findByEmail(email);
+            if(utenteTurnoRepository.filterByDateAndSum(foundUtente, dataInizio, datafine) == null)
+                responseSumDTOS.add(new NewResponseSumDTO(email, (double)0));
+            else
+                responseSumDTOS.add(new NewResponseSumDTO(email, utenteTurnoRepository.filterByDateAndSum(foundUtente, dataInizio, datafine)));
+
+        });
+        return responseSumDTOS;
     }
 
     public List<UtenteTurno> vediPerSettimana(LocalDate dataInizio){

@@ -54,22 +54,22 @@ public class UtenteTurnoController {
     }
 
     @GetMapping("/ore_totali_utente")
-    public NewResponseSumDTO oreTotali(
-            @RequestParam String email,
+    public List<NewResponseSumDTO> oreTotali(
+            @RequestParam List<String> emails,
             @RequestParam LocalDate dataInizio,
             @RequestParam LocalDate dataFine
             ){
-        return new NewResponseSumDTO(utenteTurnoService.oreTotaliUtente(email, dataInizio, dataFine));
+        return utenteTurnoService.oreTotaliUtente(emails, dataInizio, dataFine);
     }
 
-    @GetMapping("/mie_ore_totali")
-    public NewResponseSumDTO oreMieTotali(
-            @RequestParam LocalDate dataInizio,
-            @RequestParam LocalDate dataFine,
-            @AuthenticationPrincipal Utente currentUtente
-    ){
-        return new NewResponseSumDTO((utenteTurnoService.oreTotaliUtente(currentUtente.getEmail(), dataInizio,dataFine)));
-    }
+//    @GetMapping("/mie_ore_totali")
+//    public NewResponseSumDTO oreMieTotali(
+//            @RequestParam LocalDate dataInizio,
+//            @RequestParam LocalDate dataFine,
+//            @AuthenticationPrincipal Utente currentUtente
+//    ){
+//        return new NewResponseSumDTO((utenteTurnoService.oreTotaliUtente(currentUtente.getEmail(), dataInizio,dataFine)));
+//    }
 
     @GetMapping("/settimanali")
     public List<UtenteTurno> turniSettiamanli(
