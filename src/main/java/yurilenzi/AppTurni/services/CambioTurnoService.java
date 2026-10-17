@@ -15,7 +15,9 @@ import yurilenzi.AppTurni.repositories.CambioTurnoRepository;
 import yurilenzi.AppTurni.repositories.UtenteTurnoRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CambioTurnoService {
@@ -91,10 +93,41 @@ public class CambioTurnoService {
     }
 
     public List<CambioTurno> vediTuttiICambiAccettati(){
-        return cambioTurnoRepository.findByStatoRichiestaOrStatoRichiestaOrStatoRichiesta(
+        List<CambioTurno> cambi = cambioTurnoRepository.findByStatoRichiestaOrStatoRichiestaOrStatoRichiesta(
                 StatoRichiesta.APPROVATA_RISPONDENTE,
                 StatoRichiesta.APPROVATO_CAPO,
                 StatoRichiesta.RIFIUTATO_CAPO);
+        cambi.stream()
+                .filter(cambio -> cambio.getStatoRichiesta() == StatoRichiesta.APPROVATA_RISPONDENTE)
+                .forEach(cambio -> cambio.setAvvisi(calcolaAvvisiDoppioTurno(cambio)));
+        return cambi;
+    }
+
+    // Il cambio resta possibile, ma il capo viene avvisato se uno dei due finirebbe con più turni nello stesso giorno
+    private List<String> calcolaAvvisiDoppioTurno(CambioTurno cambio){
+        List<String> avvisi = new ArrayList<>();
+        UtenteTurno rich = cambio.getUtenteRichiedenteTurno();
+        UtenteTurno ris = cambio.getUtenteRispondenteTurno();
+        avvisoSeDoppio(rich, ris).ifPresent(avvisi::add);
+        avvisoSeDoppio(ris, rich).ifPresent(avvisi::add);
+        return avvisi;
+    }
+
+    // Controlla cosa succede a chi cede "cede" e riceve il turno "riceve"
+    private Optional<String> avvisoSeDoppio(UtenteTurno cede, UtenteTurno riceve){
+        if(cede.getGiornoTurno().equals(riceve.getGiornoTurno()))
+            return Optional.empty(); // stesso giorno: nessun turno in più
+        List<String> altriTurni = utenteTurnoRepository
+                .findByUtenteAndGiornoTurno(cede.getUtente(), riceve.getGiornoTurno())
+                .stream()
+                .filter(ut -> ut.getId() != cede.getId())
+                .map(ut -> ut.getTurno().getNomeTurno())
+                .toList();
+        if(altriTurni.isEmpty())
+            return Optional.empty();
+        return Optional.of(cede.getUtente().getNome() + " " + cede.getUtente().getCognome()
+                + " avrebbe più turni il " + riceve.getGiornoTurno() + " (già " + String.join(", ", altriTurni)
+                + ", in arrivo " + riceve.getTurno().getNomeTurno() + ")");
     }
 
     @Transactional

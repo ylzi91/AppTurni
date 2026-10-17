@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table (name = "cambi_turni")
@@ -25,6 +27,9 @@ public class CambioTurno {
     private UtenteTurno utenteRichiedenteTurno;
     @ManyToOne
     private UtenteTurno utenteRispondenteTurno;
+    // Non salvato a database: avvisi per il capo calcolati al momento della lettura
+    @Transient
+    private List<String> avvisi = new ArrayList<>();
 
     public CambioTurno(LocalDate dataRichiesta, UtenteTurno utenteRichiedenteTurno, UtenteTurno utenteRispondenteTurno) {
         this.dataRichiesta = dataRichiesta;

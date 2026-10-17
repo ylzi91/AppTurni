@@ -18,6 +18,7 @@ public interface UtenteTurnoRepository extends JpaRepository <UtenteTurno, Long>
     boolean existsBygiornoTurno(LocalDate dataTurno);
     boolean existsByUtenteAndTurnoAndGiornoTurno(Utente utente, Turno turno, LocalDate dataTurno);
     List<UtenteTurno> findByUtente(Utente utente);
+    List<UtenteTurno> findByUtenteAndGiornoTurno(Utente utente, LocalDate giornoTurno);
 
     List<UtenteTurno> findByUtenteAndTurnoAndGiornoTurno(Utente utente, Turno turno, LocalDate giornoTurno);
 
