@@ -34,19 +34,20 @@ public class FerieService {
     }
 
     public List<Ferie> vediMieFerie(Utente currentUtente){
-        if(ferieRepository.findByUtente(currentUtente).isEmpty())
+        List<Ferie> ferie = ferieRepository.findByUtente(currentUtente);
+        if(ferie.isEmpty())
             throw new EmptyArrayException("Non hai richieste di ferie");
-        return ferieRepository.findByUtente(currentUtente);
+        return ferie;
     }
 
     public List<Ferie> vediFerie(StatoRichiesta statoRichiesta){
         if(statoRichiesta == null){
             return ferieRepository.findAll();
         }
-        if(ferieRepository.findByStatoRichiesta(statoRichiesta).isEmpty())
+        List<Ferie> ferie = ferieRepository.findByStatoRichiesta(statoRichiesta);
+        if(ferie.isEmpty())
             throw new EmptyArrayException("Non ci sono ferie da approvare");
-        else
-            return ferieRepository.findByStatoRichiesta(statoRichiesta);
+        return ferie;
     }
 
     public Ferie findById(Long idFerie){

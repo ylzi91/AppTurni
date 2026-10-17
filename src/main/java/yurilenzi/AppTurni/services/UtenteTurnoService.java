@@ -107,10 +107,8 @@ public class UtenteTurnoService {
         List<NewResponseSumDTO> responseSumDTOS = new ArrayList<>();
         emails.forEach(email -> {
             Utente foundUtente = utenteService.findByEmail(email);
-            if(utenteTurnoRepository.filterByDateAndSum(foundUtente, dataInizio, datafine) == null)
-                responseSumDTOS.add(new NewResponseSumDTO(email, (double)0));
-            else
-                responseSumDTOS.add(new NewResponseSumDTO(email, utenteTurnoRepository.filterByDateAndSum(foundUtente, dataInizio, datafine)));
+            Double somma = utenteTurnoRepository.filterByDateAndSum(foundUtente, dataInizio, datafine);
+            responseSumDTOS.add(new NewResponseSumDTO(email, somma == null ? 0.0 : somma));
 
         });
         return responseSumDTOS;

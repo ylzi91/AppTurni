@@ -48,17 +48,15 @@ public class TurnoService {
     }
 
     public Turno checkAndSaveTurnoFerie(){
-        Turno foundTurno = null;
-        if(turnoRepository.findById("F").isPresent())
-            return turnoRepository.findById("F").get();
-        else
-            return turnoRepository.save(new Turno("F"));
+        return turnoRepository.findById("F")
+                .orElseGet(() -> turnoRepository.save(new Turno("F")));
     }
 
     public List<Turno> vediTurni(){
-        if(turnoRepository.findAll().isEmpty())
+        List<Turno> turni = turnoRepository.findAll();
+        if(turni.isEmpty())
             throw new EmptyArrayException("Non ci sono turni");
-        return turnoRepository.findAll();
+        return turni;
     }
 
 

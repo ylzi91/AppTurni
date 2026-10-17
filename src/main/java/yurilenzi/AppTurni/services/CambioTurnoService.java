@@ -51,20 +51,23 @@ public class CambioTurnoService {
     }
 
     public List<CambioTurno> vediCambiTurniIngresso(Utente currentUtente){
-        if(cambioTurnoRepository.findByUtenteRispondenteTurno(currentUtente).isEmpty())
+        List<CambioTurno> cambi = cambioTurnoRepository.findByUtenteRispondenteTurno(currentUtente);
+        if(cambi.isEmpty())
             throw new EmptyArrayException("Non ci sono cambi turno da approvare");
-        return cambioTurnoRepository.findByUtenteRispondenteTurno(currentUtente);
+        return cambi;
     }
 
     public List<CambioTurno> vediCambiTurniIngressoInCorso(Utente currentUtente){
-        if(cambioTurnoRepository.findByUtenteRispondenteTurnoAndInCorso(currentUtente, StatoRichiesta.IN_CORSO).isEmpty())
+        List<CambioTurno> cambi = cambioTurnoRepository.findByUtenteRispondenteTurnoAndInCorso(currentUtente, StatoRichiesta.IN_CORSO);
+        if(cambi.isEmpty())
             throw new EmptyArrayException("Non ci sono cambi turno da approvare");
-        return cambioTurnoRepository.findByUtenteRispondenteTurnoAndInCorso(currentUtente, StatoRichiesta.IN_CORSO);
+        return cambi;
     }
     public List<CambioTurno> vediCambiTurnoUscita(Utente currentUtente){
-        if(cambioTurnoRepository.findByUtenteRichiedenteTurno(currentUtente).isEmpty())
+        List<CambioTurno> cambi = cambioTurnoRepository.findByUtenteRichiedenteTurno(currentUtente);
+        if(cambi.isEmpty())
             throw new EmptyArrayException("Non hai effettuato nessuna richiesta di cambio");
-        return cambioTurnoRepository.findByUtenteRichiedenteTurno(currentUtente);
+        return cambi;
     }
 
     public CambioTurno findById(Long idCambio){
