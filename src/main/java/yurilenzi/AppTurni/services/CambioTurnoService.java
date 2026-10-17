@@ -49,6 +49,8 @@ public class CambioTurnoService {
 
         if(nomeTurnoRich.equals(nomeTurnoRis) && dataTurnoRich.equals(dataTurnoRis))
             throw new BadRequestException("Stai chiedendo un cambio per lo stesso turno e la stessa data");
+        bloccaSeTurnoDuplicato(foundUtenteTurnoRich, foundUtenteTurnoRis);
+        bloccaSeTurnoDuplicato(foundUtenteTurnoRis, foundUtenteTurnoRich);
         return cambioTurnoRepository.save(new CambioTurno(LocalDate.now(), foundUtenteTurnoRich, foundUtenteTurnoRis));
     }
 
@@ -103,6 +105,18 @@ public class CambioTurnoService {
         return cambi;
     }
 
+    // Lo stesso turno due volte nello stesso giorno non è mai ammesso (come in salvaUtenteTurno)
+    private void bloccaSeTurnoDuplicato(UtenteTurno cede, UtenteTurno riceve){
+        boolean duplicato = utenteTurnoRepository
+                .findByUtenteAndGiornoTurno(cede.getUtente(), riceve.getGiornoTurno())
+                .stream()
+                .filter(ut -> ut.getId() != cede.getId())
+                .anyMatch(ut -> ut.getTurno().getNomeTurno().equals(riceve.getTurno().getNomeTurno()));
+        if(duplicato)
+            throw new BadRequestException(cede.getUtente().getNome() + " " + cede.getUtente().getCognome()
+                    + " ha già il turno " + riceve.getTurno().getNomeTurno() + " il " + riceve.getGiornoTurno());
+    }
+
     // Il cambio resta possibile, ma il capo viene avvisato se uno dei due finirebbe con più turni nello stesso giorno
     private List<String> calcolaAvvisiDoppioTurno(CambioTurno cambio){
         List<String> avvisi = new ArrayList<>();
@@ -139,6 +153,8 @@ public class CambioTurnoService {
             throw new ForbiddenRequestException("Puoi solo approvare o rifiutare la richiesta");
 
         if(body.statoRichiesta() == StatoRichiesta.APPROVATO_CAPO){
+            bloccaSeTurnoDuplicato(foundCambioTurno.getUtenteRichiedenteTurno(), foundCambioTurno.getUtenteRispondenteTurno());
+            bloccaSeTurnoDuplicato(foundCambioTurno.getUtenteRispondenteTurno(), foundCambioTurno.getUtenteRichiedenteTurno());
             UtenteTurno utenteTurnoRich = utenteTurnoService.findByid(foundCambioTurno.getUtenteRichiedenteTurno().getId());
             UtenteTurno utenteTurnoRis = utenteTurnoService.findByid(foundCambioTurno.getUtenteRispondenteTurno().getId());
 
